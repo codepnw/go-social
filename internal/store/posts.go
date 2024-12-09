@@ -5,7 +5,6 @@ import (
 	"database/sql"
 
 	"github.com/lib/pq"
-	_ "github.com/lib/pq"
 )
 
 type Post struct {
@@ -28,7 +27,7 @@ func (s *PostStore) Create(ctx context.Context, p *Post) error {
 		VALUES ($1, $2, $3, $4) RETURNING id, created_at, updated_at;
 	`
 	err := s.db.QueryRowContext(
-		ctx, 
+		ctx,
 		query,
 		p.Content,
 		p.Title,

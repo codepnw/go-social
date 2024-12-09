@@ -1,0 +1,18 @@
+version: '3.9'
+
+services:
+
+  db:
+    image: postgres:alpine
+    container_name: gosocial
+    environment:
+      POSTGRES_DB: ${PG_DB}
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - "4444:5432"
+
+volumes:
+  db-data:

@@ -19,7 +19,7 @@ type UserStore struct {
 
 func (s *UserStore) Create(ctx context.Context, u *User) error {
 	query := `
-		INSERT INTO (username, password, email) 
+		INSERT INTO users (username, password, email) 
 		VALUES ($1, $2, $3) RETURNING id, created_at;
 	`
 	err := s.db.QueryRowContext(

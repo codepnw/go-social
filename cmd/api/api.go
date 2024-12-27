@@ -24,6 +24,11 @@ type config struct {
 	db     dbConfig
 	env    string
 	apiURL string
+	mail   mailConfig
+}
+
+type mailConfig struct {
+	exp time.Duration
 }
 
 type dbConfig struct {
@@ -65,6 +70,8 @@ func (app *application) mount() http.Handler {
 		})
 
 		r.Route("/users", func(r chi.Router) {
+			r.Put("/activate/{token}", app.activateUserHandler)
+
 			r.Route("/{userID}", func(r chi.Router) {
 				r.Use(app.userContextMiddleware)
 
@@ -72,10 +79,17 @@ func (app *application) mount() http.Handler {
 
 				r.Put("/follow", app.followUserHandler)
 				r.Put("/unfollow", app.unfollowUserHandler)
+			})
+			r.Group(func(r chi.Router) {
+				r.Get("/feed", app.getUserFeedHandler)
+			})
+		})
 
-				r.Group(func(r chi.Router) {
-					r.Get("/feed", app.getUserFeedHandler)
-				})
+		// Public routes
+		r.Route("/auth", func(r chi.Router) {
+			r.Post("/user", app.registerUserHandler)
+			r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+				w.Write([]byte("Test Authen Path"))
 			})
 		})
 	})

@@ -23,3 +23,11 @@ func (app *application) errorConflict(w http.ResponseWriter, r *http.Request, er
 	app.logger.Errorw("conflict error", "method", r.Method, "path", r.URL.Path, "error", err.Error())
 	writeJSONError(w, http.StatusConflict, err.Error())
 }
+
+func (app *application) errorBasicUnauthorized(w http.ResponseWriter, r *http.Request, err error) {
+	app.logger.Errorw("basic unauthorized error", "method", r.Method, "path", r.URL.Path, "error", err.Error())
+
+	w.Header().Set("WWW-Authenticate", `Basic realm="restricted", charset="UTF-8"`)
+
+	writeJSONError(w, http.StatusUnauthorized, "basic unauthorized")
+}

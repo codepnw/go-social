@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"html/template"
-	"log"
 	"time"
 
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
@@ -68,6 +67,6 @@ func (m *SendGridMailer) Send(templateFile, username, email string, data any, is
 
 		return response.StatusCode, nil
 	}
-	log.Println("\n ?????? \n")
+
 	return -1, fmt.Errorf("failed to send email after %d attempts, error: %v", maxRetires, retryErr)
 }

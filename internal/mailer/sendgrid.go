@@ -59,7 +59,7 @@ func (m *SendGridMailer) Send(templateFile, username, email string, data any, is
 	var retryErr error
 	for i := 0; i < maxRetires; i++ {
 		response, retryErr := m.client.Send(message)
-		if retryErr == nil {
+		if retryErr != nil {
 			// exponential backoff
 			time.Sleep(time.Second * time.Duration(i+1))
 			continue

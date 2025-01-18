@@ -2,10 +2,13 @@ include .envrc
 
 MIGRATIONS_PATH=./cmd/migrate/migrations
 
-.PHONY: docker-up migrate-create migrate-up migrate-down seed gen-docs
+.PHONY: docker-up docker-redis migrate-create migrate-up migrate-down seed gen-docs
 
 dokcer-up:
 	@docker compose --env-file .envrc up --build
+
+docker-redis:
+	@docker run -d --rm --name gosocial-redis -p 6379:6379 redis:7.4-alpine redis-server --loglevel warning
 
 migrate-create:
 	@migrate create -seq -ext sql -dir ${MIGRATIONS_PATH} ${filter-out $@,${MAKECMDGOALS}}

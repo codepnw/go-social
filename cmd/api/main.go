@@ -7,6 +7,7 @@ import (
 	"github.com/codepnw/social/internal/db"
 	"github.com/codepnw/social/internal/env"
 	"github.com/codepnw/social/internal/mailer"
+	"github.com/codepnw/social/internal/ratelimiter"
 	"github.com/codepnw/social/internal/store"
 	"github.com/codepnw/social/internal/store/cache"
 	"github.com/redis/go-redis/v9"
@@ -68,6 +69,11 @@ func main() {
 				iss:    "gosocial",
 			},
 		},
+		rateLimiter: ratelimiter.Config{
+			RequestsPerTimeFrame: env.GetInt("RATELIMITER_REQUESTS_COUNT", 20),
+			TimeFrame:            time.Second * 5,
+			Enabled:              env.GetBool("RATELIMITER_ENABLED", true),
+		},
 	}
 
 	// Logger
@@ -96,6 +102,12 @@ func main() {
 		defer rdb.Close()
 	}
 
+	// Rate limiter
+	rateLimiter := ratelimiter.NewFixedWindowLimiter(
+		cfg.rateLimiter.RequestsPerTimeFrame,
+		cfg.rateLimiter.TimeFrame,
+	)
+
 	store := store.NewStorage(db)
 	cacheStorage := cache.NewRedisStorage(rdb)
 
@@ -115,6 +127,7 @@ func main() {
 		logger:        logger,
 		mailer:        mailer,
 		authenticator: jwtAuthenticator,
+		rateLimiter:   rateLimiter,
 	}
 
 	mux := app.mount()
